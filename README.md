@@ -47,7 +47,20 @@ How does the data get into Elasticsearch?
 
 -   Data will be stored both in the DB and Elasticsearch (sort of duplicated)
 
-
 <br>
 
-# Understanding Basic Architecture
+# Creating and Deleting Indices
+
+```
+
+PUT /products
+{
+    "settings": {
+        "number_of_shards": 2,
+        "number_of_replicas": 2
+    }
+}
+
+DELETE /products
+
+```
