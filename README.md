@@ -64,3 +64,146 @@ PUT /products
 DELETE /products
 
 ```
+
+<br>
+
+# Indexing Documents
+
+```
+POST /products/_doc
+{
+  "name": "Coffee maker",
+  "price": 64,
+  "in_stock": 10
+}
+
+PUT /products/_doc/<custom_id>
+{
+  "name": "Coffee maker",
+  "price": 64,
+  "in_stock": 10
+}
+
+```
+
+-   `action.auto_create_index`: if enabled, indices will automatically be created when adding documents
+
+<br>
+
+# Retrieving Documents by ID
+
+```
+GET /products/_doc/<id>
+```
+
+<br>
+
+# Updating documents
+
+-   ElasticSearch Documents are immutable!
+-   we actually replaced documents
+-   The `update` API makes it look like we updated the documents
+    1. Current document is retrieved
+    2. field values are changed
+    3. existing document is replaced with the modified document
+
+```
+PUT /products/_doc/100
+{
+  "doc": {
+    "in_stock": 3
+    "tags": ["electronics"]
+  }
+}
+```
+
+<br>
+
+# Scripted Updates
+
+```
+POST /products/_update/100
+{
+  "script": {
+    "source": "ctx._source.in_stock--"
+  }
+}
+
+
+// with params
+
+POST /products/_update/100
+{
+  "script": {
+    "source": "ctx._source.in_stock -= params.quantity",
+    "params": {
+      "quantity": 4
+    }
+  }
+}
+
+
+// noop example
+
+POST /products/_update/100
+{
+  "script": {
+    "source": """
+      if(ctx._source.in_stock == 0) {
+        ctx.op = 'noop';
+      }
+
+      ctx._source.in_stock--;
+    """
+  }
+}
+
+```
+
+<br>
+
+# Upserts
+
+-   document already exist, update else create new index
+
+```
+POST /products/_update/101
+{
+  "script": {
+    "source": "ctx._source.in_stock++"
+  },
+  "upsert": {
+    "name": "Docker",
+    "price": 399,
+    "in_stock": 5
+  }
+}
+
+```
+
+<br>
+
+# Replace documents
+
+```
+PUT /products/_doc/101
+{
+  "name": "Docker 2",
+  "price": 20,
+  "in_stock": 10
+}
+
+```
+
+<br>
+
+# Deleting documents
+
+```
+DELETE /products/_doc/101
+
+```
+
+<br>
+
+# Understanding Routing
