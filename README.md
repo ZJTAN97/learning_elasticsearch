@@ -207,3 +207,28 @@ DELETE /products/_doc/101
 <br>
 
 # Understanding Routing
+
+-   Routing is the process of resolving a shard for a document
+-   Formula is used when indexing, retrieving and updating documents
+-   Routing can be customized
+-   default routing strategy distributes documents evenly
+-   One of the reason why an index shards cannot be changed, is that the routing formula would then yield different results
+
+<br>
+
+# Understand Document Versioning
+
+-   Not a revision history of documents, only store latest
+-   Elasticsearch stores an `_version` metadata field with every document
+    -   value is an integer
+    -   incremented by one when modifying a document
+    -   the value is retained for 60 seconds when deleting a document
+        -   configured with the `index.gc_deletes` setting
+    -   the `_version` field is returned when retrieving documents
+-   Default type is called internal versioning
+-   there is also external versioning type
+-   versioning shows how many times a document has been modified
+-   used to do optimistic concurrency control (previously)
+
+<br>
+
