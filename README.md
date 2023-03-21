@@ -232,3 +232,120 @@ DELETE /products/_doc/101
 
 <br>
 
+# Optimistic Concurrency Control
+
+-   Prevents overwriting documents inadvertently due to concurrent operations
+-   makes use of `_seq_no` and `_primary_term`
+
+```
+POST /products/_update/100?if_primary_term=1&if_seq_no=8
+{
+  "doc": {
+    "in_stock": 123
+  }
+}
+```
+
+<br>
+
+# Update by query
+
+-   update multiple documents within a single query
+-   this uses Primary Terms, Sequence numbers and Optimistic Concurrency control
+-   Search queries and bulk requests are sent to replication groups sequentially
+    -   Elasticsearch retries these queries up to ten times
+    -   if queries still fail, whole query is aborted
+        -   any changes made to documents will not be rolled back
+-   API returns information about failures
+
+```
+
+POST /products/_update_by_query
+{
+  "script": {
+    "source": "ctx._source.in_stock--"
+  },
+  "query": {
+    "match_all": {}
+  }
+}
+
+```
+
+<br>
+
+# Delete by query
+
+-   delete multiple documents within a singe query
+
+```
+POST /products/_delete_by_query
+{
+  "query": {
+    "match_all": {}
+  }
+}
+```
+
+<br>
+
+# Batch Processing
+
+-   Bulk API
+-   Content-Type: application/x-ndjson
+-   application/json is accepted, but not correct way
+-   Each line must end with a newline character (\n or \r\n)
+-   a failed action will not affect other actions
+
+```
+POST /_bulk
+{ "index": { "_index": "products", "_id": 200 } }
+{ "name": "Espresso Machine", "price": "199", "in_stock": 5 }
+{ "create": { "_index": "products", "_id": 201 } }
+{ "name": "Espresso Machine 2", "price": "199", "in_stock": 10 }
+
+
+GET /products/_search
+{
+  "query": {
+    "match_all": {}
+  }
+}
+
+
+POST /products/_bulk
+{ "update": { "_id": 201 } }
+{ "doc": { "price": 129 } }
+{ "delete": { "_id": 200 } }
+
+```
+
+<br>
+
+# Importing data with cURL
+
+```
+curl -H "Content-Type: application/x-ndjson" -XPOST http://localhost:9200/products/_bulk --data-binary "@products-bulk.json"
+```
+
+<br>
+
+# Analysis
+
+-   applicable to text fields/values
+-   text values are analyzed when indexing documents
+-   the result is stored in data structures that are efficient for searching etc.
+-   Standard Analyzer Process: Character filters --> Tokenizer --> Token Filters
+
+<br>
+
+# Using Analyze API
+
+```
+POST /_analyze
+{
+  "text": "2 guys walk into   a bar, but the third... DUCKS! :)",
+  "analyzer": "standard"
+}
+
+```
