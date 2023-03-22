@@ -349,3 +349,63 @@ POST /_analyze
 }
 
 ```
+
+<br>
+
+# Understanding Inverted Indices
+
+-   Mapping between terms (tokenizer) and which documents contain them
+-   Map the documents to the terms (tokenized words)
+-   Terms are sorted alphabetically
+-   every text field will consist of inverted indices (one inverted index per text field)
+-   other data types use BKD trees
+-   An inverted index is a mapping between terms and which documents contain them
+-   Each field has a dedicated inverted index
+-   inverted indices enable fast searches
+
+<br>
+
+# Introduction to mapping
+
+-   Defines the structure of documents
+    -   used to configure how values are indexed
+-   Similar to a table's schema in a relational database
+-   Explicit mapping
+    -   define field mapping ourselves
+-   Dynamic mapping
+    -   Elasticsearch generates field mappings for us
+
+<br>
+
+# Overview of data types
+
+-   `object` data type
+
+    -   used for any JSON object
+    -   `objects` may be nested
+    -   mapped using the `properties` parameter
+
+-   `nested` data type
+
+    -   similar to `object` data type, but maintains object relationships
+        -   useful when indexing array of objects
+    -   enables us to query objects independently
+        -   must use the `nested` query
+    -   `nested` objects are stored as hidden documents
+
+-   `keyword` data type
+    -   used for exact matching of values
+    -   typically used for filtering, aggregations and sorting
+    -   e.g. searching for articles with a status of PUBLISHED
+    -   for full-text searches, use the `test` data type instead
+        -   e.g. searching the body text of an artile
+
+<br>
+
+# How keyword datatype works
+
+-   keyword fields are analyzed with the keyword analyzer
+-   keyword analyzer is a no-op analyzer
+    -   it outputs the unmodified string as a single token
+    -   this token is then placed into the inverted index
+-   keyword fields are used for exact matching, aggregations and sorting
