@@ -598,3 +598,9 @@ How `date` field are stored
 <br>
 
 # Updating existing mappings
+
+-   Generally ElasticSearch field mappings cannot be changed
+-   Can add new field mappings but thats about it
+-   A few mapping parameters can be updated for existing mappings
+
+<br>
